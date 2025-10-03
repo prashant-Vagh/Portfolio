@@ -93,6 +93,8 @@ export const Portfolio = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
   const [theme, setTheme] = useState("dark");
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -101,13 +103,18 @@ export const Portfolio = () => {
     const handleScroll = () => {
       setScrollY(window.scrollY);
     };
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
 
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("scroll", handleScroll);
+    window.addEventListener("resize", handleResize);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -171,6 +178,7 @@ export const Portfolio = () => {
       textSecondary: "text-gray-400",
       accent: "text-cyan-400",
       name: "bg-gradient-to-r from-white via-cyan-200 to-blue-400 bg-clip-text",
+      menuBg: "bg-black",
     },
     light: {
       bg: "bg-gray-100",
@@ -180,6 +188,7 @@ export const Portfolio = () => {
       textSecondary: "text-gray-600",
       accent: "text-blue-600",
       name: "bg-gradient-to-r from-gray-900 via-blue-700 to-gray-600 bg-clip-text",
+      menuBg: "bg-white",
     },
     gray: {
       bg: "bg-gray-800",
@@ -189,6 +198,7 @@ export const Portfolio = () => {
       textSecondary: "text-gray-400",
       accent: "text-teal-400",
       name: "bg-gradient-to-r from-white via-cyan-200 to-blue-400 bg-clip-text",
+      menuBg: "bg-gray-800",
     },
   };
 
@@ -211,7 +221,7 @@ export const Portfolio = () => {
       {/* Gradient Orbs */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div
-          className="absolute w-96 h-96 rounded-full blur-3xl opacity-20"
+          className="absolute w-96 h-96 rounded-full blur-3xl opacity-20 md:w-96 md:h-96 w-64 h-64"
           style={{
             background: `radial-gradient(circle, rgba(0, 194, 255, 0.8), transparent)`,
             left: `${mousePosition.x - 192}px`,
@@ -219,8 +229,8 @@ export const Portfolio = () => {
             transition: "left 0.3s ease-out, top 0.3s ease-out",
           }}
         />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-cyan-500/20 to-transparent rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-500/20 to-transparent rounded-full blur-3xl" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-cyan-500/20 to-transparent rounded-full blur-3xl md:w-96 md:h-96 w-64 h-64" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-blue-500/20 to-transparent rounded-full blur-3xl md:w-96 md:h-96 w-64 h-64" />
       </div>
 
       {/* Navigation */}
@@ -244,56 +254,114 @@ export const Portfolio = () => {
                 </div>
               </div>
             </div>
-            <div
-              className={`flex gap-1 bg-white/5 rounded-full p-1 border ${currentTheme.nav}`}
-            >
-              {["about", "experience", "skills", "projects"].map((section) => (
+            {isMobile ? (
+              <div className="relative">
                 <button
-                  key={section}
-                  onClick={() => setActiveSection(section)}
-                  className={`capitalize px-4 py-2 rounded-full transition-all text-sm ${
-                    activeSection === section
-                      ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/50"
-                      : `${currentTheme.textSecondary} hover:${currentTheme.textPrimary}`
-                  }`}
+                  className={`p-2 ${currentTheme.textSecondary} hover:${currentTheme.textPrimary} focus:outline-none`}
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
-                  {section}
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+                  </svg>
                 </button>
-              ))}
-              {/* Theme Toggle */}
-              <div className="fixed top-4 right-4 z-50">
-                <select
-                  value={theme}
-                  onChange={(e) => setTheme(e.target.value)}
-                  className={`px-4 py-2 rounded-full ${currentTheme.textSecondary} bg-white/5 border ${currentTheme.nav} focus:outline-none focus:ring-2 focus:ring-${currentTheme.accent} appearance-none`}
-                >
-                  <option
-                    value="dark"
-                    className="rounded-full text-white bg-gray-800 hover:bg-gray-700"
-                  >
-                    Dark
-                  </option>
-                  <option
-                    value="light"
-                    className="rounded-full text-gray-900 bg-gray-100 hover:bg-gray-200"
-                  >
-                    Light
-                  </option>
-                  <option
-                    value="gray"
-                    className="rounded-full text-gray-100 bg-gray-700 hover:bg-gray-600"
-                  >
-                    Gray
-                  </option>
-                </select>
+                {isMenuOpen && (
+                  <div className={`absolute right-0 mt-2 w-48 ${currentTheme.menuBg} rounded-xl shadow-lg border border-cyan-500/20`}>
+                    {["about", "experience", "skills", "projects"].map((section) => (
+                      <button
+                        key={section}
+                        onClick={() => {
+                          setActiveSection(section);
+                          setIsMenuOpen(false);
+                          document.getElementById(section)?.scrollIntoView({ behavior: "smooth" });
+                        }}
+                        className={`block w-full text-left px-4 py-2 text-sm ${currentTheme.textSecondary} hover:${currentTheme.textPrimary} rounded-xl transition-colors capitalize ${activeSection === section ? "bg-cyan-500/20" : ""}`}
+                      >
+                        {section.charAt(0).toUpperCase() + section.slice(1)}
+                      </button>
+                    ))}
+                    {/* Theme Toggle */}
+                    <div className="px-4 py-2">
+                      <select
+                        value={theme}
+                        onChange={(e) => setTheme(e.target.value)}
+                        className={`w-full px-4 py-2 rounded-full ${currentTheme.textSecondary} bg-white/5 border ${currentTheme.nav} focus:outline-none focus:ring-2 focus:ring-${currentTheme.accent} appearance-none`}
+                      >
+                        <option
+                          value="dark"
+                          className="rounded-full text-white bg-gray-800 hover:bg-gray-700"
+                        >
+                          Dark
+                        </option>
+                        <option
+                          value="light"
+                          className="rounded-full text-gray-900 bg-gray-100 hover:bg-gray-200"
+                        >
+                          Light
+                        </option>
+                        <option
+                          value="gray"
+                          className="rounded-full text-gray-100 bg-gray-700 hover:bg-gray-600"
+                        >
+                          Gray
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            ) : (
+              <div
+                className={`flex gap-1 bg-white/5 rounded-full p-1 border ${currentTheme.nav}`}
+              >
+                {["about", "experience", "skills", "projects"].map((section) => (
+                  <button
+                    key={section}
+                    onClick={() => setActiveSection(section)}
+                    className={`capitalize px-4 py-2 rounded-full transition-all text-sm ${
+                      activeSection === section
+                        ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/50"
+                        : `${currentTheme.textSecondary} hover:${currentTheme.textPrimary}`
+                    }`}
+                    id={section}
+                  >
+                    {section}
+                  </button>
+                ))}
+                {/* Theme Toggle */}
+                <div className="fixed top-4 right-4 z-50">
+                  <select
+                    value={theme}
+                    onChange={(e) => setTheme(e.target.value)}
+                    className={`px-4 py-2 rounded-full ${currentTheme.textSecondary} bg-white/5 border ${currentTheme.nav} focus:outline-none focus:ring-2 focus:ring-${currentTheme.accent} appearance-none`}
+                  >
+                    <option
+                      value="dark"
+                      className="rounded-full text-white bg-gray-800 hover:bg-gray-700"
+                    >
+                      Dark
+                    </option>
+                    <option
+                      value="light"
+                      className="rounded-full text-gray-900 bg-gray-100 hover:bg-gray-200"
+                    >
+                      Light
+                    </option>
+                    <option
+                      value="gray"
+                      className="rounded-full text-gray-100 bg-gray-700 hover:bg-gray-600"
+                    >
+                      Gray
+                    </option>
+                  </select>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 px-6">
+      <section className="relative pt-32 pb-20 px-6" id="about">
         <div className="max-w-7xl mx-auto">
           <div className="text-center space-y-8 relative z-10">
             <div className="inline-block">
@@ -306,7 +374,7 @@ export const Portfolio = () => {
             </div>
 
             <h1
-              className={`text-7xl font-bold mb-4 ${currentTheme.name} text-transparent leading-tight`}
+              className={`text-5xl md:text-7xl font-bold mb-4 ${currentTheme.name} text-transparent leading-tight`}
             >
               {portfolioContent.name}
             </h1>
@@ -314,7 +382,7 @@ export const Portfolio = () => {
             <div className="flex items-center justify-center gap-3">
               <div className="h-px w-12 bg-gradient-to-r from-transparent to-cyan-500" />
               <p
-                className={`text-2xl ${currentTheme.accent} font-semibold tracking-wide`}
+                className={`text-xl md:text-2xl ${currentTheme.accent} font-semibold tracking-wide`}
               >
                 {portfolioContent.subtitle}
               </p>
@@ -322,7 +390,7 @@ export const Portfolio = () => {
             </div>
 
             <p
-              className={`text-xl ${currentTheme.textSecondary} max-w-3xl mx-auto leading-relaxed`}
+              className={`text-base md:text-xl ${currentTheme.textSecondary} max-w-3xl mx-auto leading-relaxed`}
             >
               {portfolioContent.tagline.split(" ").map((word, i) =>
                 word.includes("web") || word.includes("industrial") ? (
@@ -362,20 +430,20 @@ export const Portfolio = () => {
             </div>
 
             {/* Floating Stats */}
-            <div className="flex justify-center gap-8 pt-12">
+            <div className="flex justify-center gap-4 md:gap-8 pt-12 flex-wrap">
               {portfolioContent.stats.map((stat, i) => {
                 const StatIcon = { Briefcase, Code, Terminal }[stat.icon];
                 return (
                   <div key={i} className="relative group">
                     <div
-                      className={`${currentTheme.card} backdrop-blur-sm hover:border-cyan-500/50 transition-all rounded-2xl p-6 border`}
+                      className={`${currentTheme.card} backdrop-blur-sm hover:border-cyan-500/50 transition-all rounded-2xl p-4 md:p-6 border`}
                     >
                       <div className="flex items-center gap-3 mb-2">
                         <StatIcon
                           className={`w-5 h-5 ${currentTheme.accent}`}
                         />
                         <div
-                          className={`text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent`}
+                          className={`text-2xl md:text-3xl font-bold bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent`}
                         >
                           {stat.value}
                         </div>
@@ -396,10 +464,10 @@ export const Portfolio = () => {
       <div className="max-w-7xl mx-auto px-6 pb-20 relative z-10">
         {/* About Section */}
         {activeSection === "about" && (
-          <div className="space-y-8 animate-fadeIn">
+          <div className="space-y-8 animate-fadeIn" id="about">
             <div className="flex items-center gap-3 mb-8">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent to-cyan-500/50" />
-              <h3 className={`text-4xl font-bold ${currentTheme.textPrimary}`}>
+              <h3 className={`text-3xl md:text-4xl font-bold ${currentTheme.textPrimary}`}>
                 {portfolioContent.about.title}
               </h3>
               <div className="h-px flex-1 bg-gradient-to-l from-transparent to-cyan-500/50" />
@@ -412,7 +480,7 @@ export const Portfolio = () => {
                 {portfolioContent.about.paragraphs.map((para, i) => (
                   <p
                     key={i}
-                    className={`text-lg ${currentTheme.textSecondary} leading-relaxed`}
+                    className={`text-base md:text-lg ${currentTheme.textSecondary} leading-relaxed`}
                   >
                     {para.split(" ").map((word, j) =>
                       word.includes("Software") ||
@@ -481,11 +549,11 @@ export const Portfolio = () => {
 
         {/* Experience Section */}
         {activeSection === "experience" && (
-          <div className="space-y-8 animate-fadeIn">
+          <div className="space-y-8 animate-fadeIn" id="experience">
             <div className="flex items-center gap-3 mb-8">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent to-cyan-500/50" />
               <h3
-                className={`text-4xl font-bold ${currentTheme.textPrimary} flex items-center gap-3`}
+                className={`text-3xl md:text-4xl font-bold ${currentTheme.textPrimary} flex items-center gap-3`}
               >
                 <Briefcase className={`w-8 h-8 ${currentTheme.accent}`} />
                 {portfolioContent.experience.title}
@@ -496,22 +564,22 @@ export const Portfolio = () => {
             <div className="relative">
               <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-cyan-500 via-blue-500 to-transparent" />
               <div
-                className={`${currentTheme.card} backdrop-blur-xl rounded-3xl p-8 hover:border-cyan-500/40 transition-all ml-8`}
+                className={`${currentTheme.card} backdrop-blur-xl rounded-3xl p-4 md:p-8 hover:border-cyan-500/40 transition-all ml-4 md:ml-8`}
               >
-                <div className="flex items-start gap-4 mb-8">
+                <div className="flex flex-col md:flex-row items-start gap-4 mb-8">
                   <div className="p-4 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-2xl border border-cyan-500/30">
                     <Award className={`w-8 h-8 ${currentTheme.accent}`} />
                   </div>
                   <div>
                     <h4
-                      className={`text-3xl font-bold ${currentTheme.textPrimary} mb-2`}
+                      className={`text-2xl md:text-3xl font-bold ${currentTheme.textPrimary} mb-2`}
                     >
                       {portfolioContent.experience.job.title}
                     </h4>
                     <p className={`${currentTheme.accent} font-medium text-lg`}>
                       {portfolioContent.experience.job.company}
                     </p>
-                    <div className="flex gap-2 mt-3">
+                    <div className="flex gap-2 mt-3 flex-wrap">
                       {portfolioContent.experience.job.tags.map((tag, i) => (
                         <span
                           key={i}
@@ -531,7 +599,7 @@ export const Portfolio = () => {
                 <div className="space-y-8">
                   <div>
                     <h5
-                      className={`text-xl font-semibold ${currentTheme.textPrimary} mb-4 flex items-center gap-2`}
+                      className={`text-lg md:text-xl font-semibold ${currentTheme.textPrimary} mb-4 flex items-center gap-2`}
                     >
                       <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full" />
                       Key Achievements
@@ -544,7 +612,7 @@ export const Portfolio = () => {
                               <div className="w-2 h-2 bg-cyan-400 rounded-full group-hover:scale-150 transition-transform" />
                             </div>
                             <span
-                              className={`${currentTheme.textSecondary} leading-relaxed`}
+                              className={`${currentTheme.textSecondary} leading-relaxed text-base md:text-lg`}
                             >
                               {achievement}
                             </span>
@@ -556,7 +624,7 @@ export const Portfolio = () => {
 
                   <div className="pt-8 border-t border-cyan-500/20">
                     <h5
-                      className={`text-xl font-semibold ${currentTheme.textPrimary} mb-4 flex items-center gap-2`}
+                      className={`text-lg md:text-xl font-semibold ${currentTheme.textPrimary} mb-4 flex items-center gap-2`}
                     >
                       <div className="w-1.5 h-1.5 bg-cyan-400 rounded-full" />
                       Leadership Responsibilities
@@ -569,7 +637,7 @@ export const Portfolio = () => {
                               <div className="w-2 h-2 bg-cyan-400 rounded-full group-hover:scale-150 transition-transform" />
                             </div>
                             <span
-                              className={`${currentTheme.textSecondary} leading-relaxed`}
+                              className={`${currentTheme.textSecondary} leading-relaxed text-base md:text-lg`}
                             >
                               {responsibility}
                             </span>
@@ -586,11 +654,11 @@ export const Portfolio = () => {
 
         {/* Skills Section */}
         {activeSection === "skills" && (
-          <div className="space-y-8">
+          <div className="space-y-8" id="skills">
             <div className="flex items-center gap-3 mb-8">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent to-cyan-500/50" />
               <h3
-                className={`text-4xl font-bold ${currentTheme.textPrimary} flex items-center gap-3`}
+                className={`text-3xl md:text-4xl font-bold ${currentTheme.textPrimary} flex items-center gap-3`}
               >
                 <Code className={`w-8 h-8 ${currentTheme.accent}`} />
                 {portfolioContent.skills.title}
@@ -694,10 +762,10 @@ export const Portfolio = () => {
 
         {/* Projects Section */}
         {activeSection === "projects" && (
-          <div className="space-y-8">
+          <div className="space-y-8" id="projects">
             <div className="flex items-center gap-3 mb-8">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent to-cyan-500/50" />
-              <h3 className={`text-4xl font-bold ${currentTheme.textPrimary}`}>
+              <h3 className={`text-3xl md:text-4xl font-bold ${currentTheme.textPrimary}`}>
                 {portfolioContent.projects.title}
               </h3>
               <div className="h-px flex-1 bg-gradient-to-l from-transparent to-cyan-500/50" />
