@@ -47,7 +47,7 @@ const portfolioContent = {
       tags: ["Full-Time", "Tech Lead"],
       achievements: [
         "Developed animated industrial simulations using PLC/SCADA sensor data in Ignition Perspective, bringing real-time manufacturing data to life",
-        "Built reusable React components including flow charts and Gantt charts with JavaScript/TypeScript dual compatibility",
+        "Built reusable React components including flow charts , Gantt charts,dashboards, widgets, etc with JavaScript/TypeScript dual compatibility",
         "Led research and architecture of React applications from scratch, including AWS infrastructure setup",
       ],
       responsibilities: [
@@ -122,19 +122,20 @@ export const Portfolio = () => {
     cloud: ["AWS EC2", "AWS IAM", "AWS CodeCommit", "AWS Policies"],
     frontend: [
       "React.js",
-      "React TypeScript",
       "Vite",
+      "Ignition",
       "JavaScript",
       "TypeScript",
       "HTML",
       "CSS",
     ],
-    backend: ["Python", "Ignition Scripting"],
-    tools: ["ChatGPT", "Claude AI", "Perplexity", "Gemini"],
+    backend: ["Python", "Ignition Scripting", "node.js", "fastapi"],
+    tools: ["ChatGPT", "Claude AI", "Perplexity", "Gemini", "Grok"],
     specialized: [
       "Ignition Perspective",
-      "PLC/SCADA Integration",
       "Industrial Automation",
+      "Analystics Dashboards",
+      "React Applications",
     ],
   };
 
@@ -260,25 +261,47 @@ export const Portfolio = () => {
                   className={`p-2 ${currentTheme.textSecondary} hover:${currentTheme.textPrimary} focus:outline-none`}
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+                  <svg
+                    className="w-6 h-6"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 12h16m-7 6h7"
+                    />
                   </svg>
                 </button>
                 {isMenuOpen && (
-                  <div className={`absolute right-0 mt-2 w-48 ${currentTheme.menuBg} rounded-xl shadow-lg border border-cyan-500/20`}>
-                    {["about", "experience", "skills", "projects"].map((section) => (
-                      <button
-                        key={section}
-                        onClick={() => {
-                          setActiveSection(section);
-                          setIsMenuOpen(false);
-                          document.getElementById(section)?.scrollIntoView({ behavior: "smooth" });
-                        }}
-                        className={`block w-full text-left px-4 py-2 text-sm ${currentTheme.textSecondary} hover:${currentTheme.textPrimary} rounded-xl transition-colors capitalize ${activeSection === section ? "bg-cyan-500/20" : ""}`}
-                      >
-                        {section.charAt(0).toUpperCase() + section.slice(1)}
-                      </button>
-                    ))}
+                  <div
+                    className={`absolute right-0 mt-2 w-48 ${currentTheme.menuBg} rounded-xl shadow-lg border border-cyan-500/20`}
+                  >
+                    {["about", "experience", "skills", "projects"].map(
+                      (section) => (
+                        <button
+                          key={section}
+                          onClick={() => {
+                            setActiveSection(section);
+                            setIsMenuOpen(false);
+                            document
+                              .getElementById("main-content-header")
+                              ?.scrollIntoView({ behavior: "smooth" });
+                          }}
+                          className={`block w-full text-left px-4 py-2 text-sm ${
+                            currentTheme.textSecondary
+                          } hover:${
+                            currentTheme.textPrimary
+                          } rounded-xl transition-colors capitalize ${
+                            activeSection === section ? "bg-cyan-500/20" : ""
+                          }`}
+                        >
+                          {section.charAt(0).toUpperCase() + section.slice(1)}
+                        </button>
+                      )
+                    )}
                     {/* Theme Toggle */}
                     <div className="px-4 py-2">
                       <select
@@ -313,20 +336,27 @@ export const Portfolio = () => {
               <div
                 className={`flex gap-1 bg-white/5 rounded-full p-1 border ${currentTheme.nav}`}
               >
-                {["about", "experience", "skills", "projects"].map((section) => (
-                  <button
-                    key={section}
-                    onClick={() => setActiveSection(section)}
-                    className={`capitalize px-4 py-2 rounded-full transition-all text-sm ${
-                      activeSection === section
-                        ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/50"
-                        : `${currentTheme.textSecondary} hover:${currentTheme.textPrimary}`
-                    }`}
-                    id={section}
-                  >
-                    {section}
-                  </button>
-                ))}
+                {["about", "experience", "skills", "projects"].map(
+                  (section) => (
+                    <button
+                      key={section}
+                      onClick={() => {
+                        setActiveSection(section);
+                        document
+                          .getElementById("main-content-header")
+                          ?.scrollIntoView({ behavior: "smooth" });
+                      }}
+                      className={`capitalize px-4 py-2 rounded-full transition-all text-sm ${
+                        activeSection === section
+                          ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/50"
+                          : `${currentTheme.textSecondary} hover:${currentTheme.textPrimary}`
+                      }`}
+                      id={section}
+                    >
+                      {section}
+                    </button>
+                  )
+                )}
                 {/* Theme Toggle */}
                 <div className="fixed top-4 right-4 z-50">
                   <select
@@ -448,7 +478,10 @@ export const Portfolio = () => {
                           {stat.value}
                         </div>
                       </div>
-                      <div className={`${currentTheme.textSecondary} text-sm`}>
+                      <div
+                        className={`${currentTheme.textSecondary} text-sm`}
+                        id="main-content-header"
+                      >
                         {stat.label}
                       </div>
                     </div>
@@ -467,7 +500,9 @@ export const Portfolio = () => {
           <div className="space-y-8 animate-fadeIn" id="about">
             <div className="flex items-center gap-3 mb-8">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent to-cyan-500/50" />
-              <h3 className={`text-3xl md:text-4xl font-bold ${currentTheme.textPrimary}`}>
+              <h3
+                className={`text-3xl md:text-4xl font-bold ${currentTheme.textPrimary}`}
+              >
                 {portfolioContent.about.title}
               </h3>
               <div className="h-px flex-1 bg-gradient-to-l from-transparent to-cyan-500/50" />
@@ -765,7 +800,9 @@ export const Portfolio = () => {
           <div className="space-y-8" id="projects">
             <div className="flex items-center gap-3 mb-8">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent to-cyan-500/50" />
-              <h3 className={`text-3xl md:text-4xl font-bold ${currentTheme.textPrimary}`}>
+              <h3
+                className={`text-3xl md:text-4xl font-bold ${currentTheme.textPrimary}`}
+              >
                 {portfolioContent.projects.title}
               </h3>
               <div className="h-px flex-1 bg-gradient-to-l from-transparent to-cyan-500/50" />
